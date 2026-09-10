@@ -7,7 +7,7 @@ const projects = [
     description:
       "Pipeline completo de engenharia e ciência de dados sobre o SIVEP-Gripe (SRAG), com dashboard interativo atualizado semanalmente.",
     cta: "Ver projeto",
-    link: "https://dados.angelaleite.com",
+    link: "/gripe/",
     visual: `
       <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="100" cy="100" r="92" stroke="#FFB700" stroke-opacity="0.25" stroke-width="1.5"/>
