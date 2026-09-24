@@ -3,7 +3,8 @@
 # Rodar na VPS como root:  bash /opt/hermes/install-theme.sh
 set -euo pipefail
 
-BASE="https://raw.githubusercontent.com/angelaleitte/projetos-dados/main/hermes-theme"
+# Arquivos buscados por hash de commit (conteudo imutavel, sem cache do CDN).
+BASE="https://raw.githubusercontent.com/angelaleitte/projetos-dados/f3695eddfcb8f691de0b375bf5ecfabc325f8884/hermes-theme"
 H=/opt/hermes
 ROUTE=/data/traefik/dynamic/hermes.yml
 
@@ -13,15 +14,17 @@ mkdir -p "$H/nginx/theme/fonts" "$H/data/dashboard-themes"
 cp "$H/docker-compose.yml" "$H/docker-compose.yml.bak"
 cp "$ROUTE" "$H/hermes-route.yml.bak"
 
-CB=$(date +%s)
-dl() { curl -fsSL "$BASE/$1?cb=$CB" -o "$2" && echo "baixado: $2"; }
-dl nginx.conf                    "$H/nginx/default.conf"
-dl login.css                     "$H/nginx/theme/login.css"
-dl fonts.css                     "$H/nginx/theme/fonts.css"
-dl fonts/figtree-latin.woff2     "$H/nginx/theme/fonts/figtree-latin.woff2"
-dl fonts/figtree-latin-ext.woff2 "$H/nginx/theme/fonts/figtree-latin-ext.woff2"
-dl spotify.yaml                  "$H/data/dashboard-themes/spotify.yaml"
-dl docker-compose.yml            "$H/docker-compose.yml"
+# textos: remove CR por garantia; binarios (fontes): como estao
+dl()  { curl -fsSL "$BASE/$1" | tr -d '\r' > "$2" && echo "baixado: $2"; }
+dlb() { curl -fsSL "$BASE/$1" -o "$2" && echo "baixado: $2"; }
+
+dl  nginx.conf                    "$H/nginx/default.conf"
+dl  login.css                     "$H/nginx/theme/login.css"
+dl  fonts.css                     "$H/nginx/theme/fonts.css"
+dlb fonts/figtree-latin.woff2     "$H/nginx/theme/fonts/figtree-latin.woff2"
+dlb fonts/figtree-latin-ext.woff2 "$H/nginx/theme/fonts/figtree-latin-ext.woff2"
+dl  spotify.yaml                  "$H/data/dashboard-themes/spotify.yaml"
+dl  docker-compose.yml            "$H/docker-compose.yml"
 
 cd "$H"
 echo "--- pre-check do nginx (nada foi alterado ainda) ---"
