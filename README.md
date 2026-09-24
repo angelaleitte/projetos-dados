@@ -41,7 +41,10 @@ dados.angelaleite.com/<novo>/    → próximos projetos
 
 ```
 index.html   — estrutura da página
-style.css    — identidade visual (tokens do design-system.md do site principal)
+style.css    — identidade visual: Design System inspirado no Spotify (fundo
+               #121212, verde #1ed760 só em ações/estados ativos, pílulas,
+               botões em caixa alta). Fonte Figtree no lugar da SpotifyMixUI,
+               que é proprietária.
 script.js    — array `projects` (conteúdo do carrossel) + lógica de rotação/tema
 ```
 

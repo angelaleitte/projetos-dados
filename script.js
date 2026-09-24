@@ -10,10 +10,11 @@ const projects = [
     link: "/gripe/",
     visual: `
       <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="100" cy="100" r="92" stroke="#FFB700" stroke-opacity="0.25" stroke-width="1.5"/>
-        <path d="M20 130 L55 130 L70 90 L90 150 L110 60 L130 130 L180 130" stroke="#FFB700" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        <circle cx="110" cy="60" r="6" fill="#FFD000"/>
-        <rect x="30" y="150" width="140" height="2" fill="#444342"/>
+        <circle cx="100" cy="100" r="92" stroke="#4d4d4d" stroke-width="1.5"/>
+        <circle cx="100" cy="100" r="64" stroke="#333333" stroke-width="1.5"/>
+        <path d="M20 130 L55 130 L70 90 L90 150 L110 60 L130 130 L180 130" stroke="#1ed760" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="110" cy="60" r="6" fill="#ffffff"/>
+        <rect x="30" y="150" width="140" height="2" rx="1" fill="#4d4d4d"/>
       </svg>`,
   },
   {
@@ -25,9 +26,9 @@ const projects = [
     link: null,
     visual: `
       <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="100" cy="100" r="92" stroke="#444342" stroke-width="1.5" stroke-dasharray="6 8"/>
-        <rect x="70" y="70" width="60" height="60" rx="10" stroke="#6B6966" stroke-width="4"/>
-        <path d="M85 100 h30 M100 85 v30" stroke="#FFB700" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="92" stroke="#4d4d4d" stroke-width="1.5" stroke-dasharray="6 8"/>
+        <rect x="70" y="70" width="60" height="60" rx="10" stroke="#7c7c7c" stroke-width="4"/>
+        <path d="M85 100 h30 M100 85 v30" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
       </svg>`,
   },
 ];
@@ -116,26 +117,3 @@ function restartAutoAdvance() {
 renderDots();
 render();
 restartAutoAdvance();
-
-// ---------- tema claro/escuro ----------
-const themeToggle = document.getElementById("themeToggle");
-const root = document.documentElement;
-const savedTheme = (() => {
-  try { return localStorage.getItem("al-theme"); } catch (e) { return null; }
-})();
-if (savedTheme === "light") {
-  root.setAttribute("data-theme", "light");
-  themeToggle.setAttribute("aria-pressed", "true");
-}
-
-themeToggle.addEventListener("click", () => {
-  const isLight = root.getAttribute("data-theme") === "light";
-  if (isLight) {
-    root.removeAttribute("data-theme");
-    themeToggle.setAttribute("aria-pressed", "false");
-  } else {
-    root.setAttribute("data-theme", "light");
-    themeToggle.setAttribute("aria-pressed", "true");
-  }
-  try { localStorage.setItem("al-theme", isLight ? "dark" : "light"); } catch (e) {}
-});
