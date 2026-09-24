@@ -67,6 +67,17 @@ h1 {
   box-shadow: #ffffff 0 0 0 2px inset;
 }
 
+/* preenchimento automático do navegador pinta o campo de azul-claro: neutraliza */
+.field-input:-webkit-autofill,
+.field-input:-webkit-autofill:hover,
+.field-input:-webkit-autofill:focus,
+.field-input:autofill {
+  -webkit-text-fill-color: #ffffff;
+  caret-color: #ffffff;
+  box-shadow: rgb(124, 124, 124) 0 0 0 1px inset, 0 0 0 1000px #1f1f1f inset !important;
+  transition: background-color 9999s ease-out 0s;
+}
+
 .provider-btn {
   background: #1ed760;
   color: #000000;
