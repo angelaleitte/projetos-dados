@@ -13,7 +13,8 @@ mkdir -p "$H/nginx/theme/fonts" "$H/data/dashboard-themes"
 cp "$H/docker-compose.yml" "$H/docker-compose.yml.bak"
 cp "$ROUTE" "$H/hermes-route.yml.bak"
 
-dl() { curl -fsSL "$BASE/$1" -o "$2" && echo "baixado: $2"; }
+CB=$(date +%s)
+dl() { curl -fsSL "$BASE/$1?cb=$CB" -o "$2" && echo "baixado: $2"; }
 dl nginx.conf                    "$H/nginx/default.conf"
 dl login.css                     "$H/nginx/theme/login.css"
 dl fonts.css                     "$H/nginx/theme/fonts.css"
