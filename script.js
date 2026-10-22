@@ -18,6 +18,29 @@ const projects = [
       </svg>`,
   },
   {
+    tag: "Logística & Agenda",
+    title: 'Visitas técnicas agendadas com <span class="accent">clareza</span>.',
+    description:
+      "Aplicativo de agendamento e logística de campo: data, horário, local, técnico e tipo de serviço, com agenda de status, edição, conclusão e cancelamento.",
+    cta: "Ver projeto",
+    link: "/techroute/",
+    visual: `
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="92" stroke="#4d4d4d" stroke-width="1.5"/>
+        <rect x="50" y="58" width="100" height="88" rx="10" stroke="#7c7c7c" stroke-width="3"/>
+        <path d="M50 82 H150" stroke="#7c7c7c" stroke-width="3"/>
+        <path d="M76 50 V66 M124 50 V66" stroke="#ffffff" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="76" cy="100" r="4" fill="#4d4d4d"/>
+        <circle cx="100" cy="100" r="4" fill="#4d4d4d"/>
+        <circle cx="124" cy="100" r="4" fill="#4d4d4d"/>
+        <circle cx="76" cy="122" r="4" fill="#4d4d4d"/>
+        <circle cx="100" cy="122" r="7" fill="#1ed760"/>
+        <circle cx="124" cy="122" r="4" fill="#4d4d4d"/>
+        <path d="M100 122 C118 142 138 126 152 152" stroke="#1ed760" stroke-width="3" stroke-dasharray="5 6" stroke-linecap="round"/>
+        <circle cx="152" cy="152" r="6" fill="#ffffff"/>
+      </svg>`,
+  },
+  {
     tag: "Em breve",
     title: 'O próximo projeto está <span class="accent">a caminho</span>.',
     description:

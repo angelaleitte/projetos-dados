@@ -4,10 +4,17 @@ Página inicial (hub) do portfólio de projetos. Cada projeto vive em sua própr
 pasta/rota dentro do mesmo domínio, compartilhando um único banco de dados.
 
 ```
-dados.angelaleite.com/           → esta página (hub)
-dados.angelaleite.com/gripe/     → Projeto SRAG (Dash + MySQL)
-dados.angelaleite.com/<novo>/    → próximos projetos
+dados.angelaleite.com/            → esta página (hub)
+dados.angelaleite.com/gripe/      → Projeto SRAG (Dash + MySQL)
+dados.angelaleite.com/techroute/  → TechRoute (Node + Express + SQLite)
+dados.angelaleite.com/<novo>/     → próximos projetos
 ```
+
+| Rota | App no Coolify | Repositório / branch | Banco | Alias na rede `proxy` | Arquivo de rota (VPS) |
+|---|---|---|---|---|---|
+| `/` | `projetos-hub` | `projetos-dados` / `main` | — | `hub-app` | `dados-angelaleite.yml` |
+| `/gripe/` | `projeto-gripe-app` | `projeto-gripe` / `main` | MySQL `projDados` | `dados-app` | `dados-angelaleite.yml` |
+| `/techroute/` | `techroute-app` | `techroute` / **`deploy-dados`** | SQLite no volume `/data` | `techroute-app` | `techroute.yml` |
 
 ---
 
@@ -77,6 +84,17 @@ app = dash.Dash(__name__, url_base_pathname="/clima/")
 Sem isso, os assets internos (JS/CSS) do framework quebram quando acessados
 por baixo de uma subpasta.
 
+**Variação sem base path (foi o caso do TechRoute):** quando o app não tem essa
+opção (ex: Express servindo HTML estático), deixe o app **sem saber** do prefixo e
+faça duas coisas: (a) no código do front, troque os caminhos absolutos
+(`/api/...`, `/css/...`, `/js/...`) por **relativos** (`api/...`, `css/...`,
+`js/...`), que funcionam igual em `localhost` e na subpasta; (b) no Traefik,
+use o middleware `stripPrefix` (passo 4) pra o app continuar recebendo as
+requisições na raiz. Faça essas mudanças numa **branch própria** (ex:
+`deploy-dados`) se o repositório precisa continuar intacto na `main`.
+Se o app depende de arquivos ignorados pelo Git (ex: CSS em `docs/`), copie-os
+para dentro do que vai pra imagem.
+
 ### 3. Conectar ao banco compartilhado (se precisar de dados)
 
 Use a mesma string de conexão do banco `srag-mysql`, só trocando o nome da
@@ -115,6 +133,48 @@ Rotas com `PathPrefix` precisam de `priority` maior que a da rota da hub
 (`hub-app`, que usa `priority: 1` e captura tudo em `/`), senão o Traefik
 pode rotear errado.
 
+**Preferência atual: um arquivo por projeto** (ex: `/data/traefik/dynamic/clima.yml`)
+em vez de editar o `dados-angelaleite.yml` — assim um erro de YAML num projeto
+novo não derruba as rotas que já funcionam. Use nomes únicos de router,
+service e middleware (prefixe com o nome do projeto), porque o Traefik junta
+todos os arquivos da pasta.
+
+Para apps **sem base path** (variação do passo 2), o arquivo do TechRoute
+(`techroute.yml`) é o modelo: `stripPrefix` + redirecionamento de
+`/techroute` para `/techroute/` (sem a barra final os caminhos relativos
+quebram):
+
+```yaml
+http:
+  middlewares:
+    techroute-slash:
+      redirectRegex:
+        regex: "^(https?://[^/]+)/techroute$"
+        replacement: "${1}/techroute/"
+        permanent: true
+    techroute-strip:
+      stripPrefix:
+        prefixes:
+          - "/techroute"
+  routers:
+    techroute:
+      rule: "Host(`dados.angelaleite.com`) && (Path(`/techroute`) || PathPrefix(`/techroute/`))"
+      entryPoints:
+        - websecure
+      priority: 100
+      middlewares:
+        - techroute-slash
+        - techroute-strip
+      service: techroute-svc
+      tls:
+        certResolver: letsencrypt
+  services:
+    techroute-svc:
+      loadBalancer:
+        servers:
+          - url: "http://techroute-app:3000"
+```
+
 ### 5. Conectar o container na rede `proxy`
 
 Achar o nome do container novo:
@@ -128,11 +188,19 @@ docker network connect --alias clima-app proxy <nome-do-container>
 ```
 
 E cadastrar no script de auto-reconexão, editando
-`/usr/local/bin/coolify-network-fix.sh` (adicionar mais um `case`):
+`/usr/local/bin/coolify-network-fix.sh` (adicionar mais um `case`). Hoje ele
+reconhece três apps:
 ```bash
-clima-app-uuid-do-coolify-*) alias="clima-app" ;;
+pg2njqrkbhun9o9dpwe66pl4-*) alias="dados-app" ;;      # /gripe
+hioq99ut0lqohf3ixn8wngu6-*) alias="hub-app" ;;        # hub (/)
+z81z1jeuauhdtdc3hcdmi7fq-*) alias="techroute-app" ;;  # /techroute
+# novo projeto: <uuid-do-app-no-coolify>-*) alias="clima-app" ;;
 ```
 depois `sudo systemctl restart coolify-network-fix.service`.
+
+**Faça isso ANTES do primeiro deploy do app novo**: assim o serviço conecta o
+container sozinho e a rota já responde 200 logo após o deploy (foi como o
+TechRoute entrou no ar, sem passar por 502).
 
 ### 6. Adicionar o card no carrossel da hub
 
@@ -176,7 +244,18 @@ connect` do passo 5 manualmente, e confirme que o prefixo do container está
 cadastrado no script de auto-reconexão pros próximos deploys.
 
 **Assets (CSS/JS) do app quebrados quando acessado pela subpasta**
-→ Falta configurar o "base path" do framework (passo 2).
+→ Falta configurar o "base path" do framework (passo 2), ou ainda há caminhos
+absolutos (`/css/...`) no front de um app servido com `stripPrefix`.
+
+**App abre sem estilo (só HTML cru) depois de publicar**
+→ O CSS estava num caminho ignorado pelo Git (ex: `docs/`) e não foi pra
+imagem. Confira no navegador (aba Rede) qual arquivo deu 404.
+
+**Dados do TechRoute sumiram depois de um deploy**
+→ O SQLite fica no volume persistente `techroute-data`, montado em `/data`
+(variável `DATABASE_PATH=/data/techroute.db`). Se o volume foi removido ou o
+mount path mudou, o banco recomeça vazio. Não apague o volume no Coolify ao
+excluir/recriar o app sem antes copiar o arquivo.
 
 **O painel do Coolify mostra o proxy dele (`coolify-proxy`) como "Exited"**
 → Normal nessa VPS. O Traefik de verdade é outro container (`traefik`,
