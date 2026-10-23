@@ -4,7 +4,7 @@
 set -euo pipefail
 
 # Arquivos buscados por hash de commit (conteudo imutavel, sem cache do CDN).
-BASE="https://raw.githubusercontent.com/angelaleitte/projetos-dados/f3695eddfcb8f691de0b375bf5ecfabc325f8884/hermes-theme"
+BASE="https://raw.githubusercontent.com/angelaleitte/projetos-dados/beb1fdd80b0998a1509807b78bd2123d9e812a39/hermes-theme"
 H=/opt/hermes
 ROUTE=/data/traefik/dynamic/hermes.yml
 
